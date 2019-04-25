@@ -3,6 +3,8 @@
 require 'bb/client'
 require 'sentry_logging'
 
+# Class to contain logic pertaining to the verification and logging of MHV accounts
+#
 class MhvAccountTypeService
   include SentryLogging
   ELIGIBLE_DATA_CLASS_COUNT_TO_ACCOUNT_LEVEL = {
@@ -14,6 +16,8 @@ class MhvAccountTypeService
   MHV_DOWN_MESSAGE = 'MhvAccountTypeService: could not fetch eligible data classes'
   UNEXPECTED_DATA_CLASS_COUNT_MESSAGE = 'MhvAccountTypeService: eligible data class mapping inconsistency'
 
+  # @param user [UserClass] TODO:
+  #
   def initialize(user)
     @user = user
     @eligible_data_classes = fetch_eligible_data_classes if mhv_account?
@@ -21,6 +25,8 @@ class MhvAccountTypeService
 
   attr_reader :user, :eligible_data_classes
 
+  #
+  #
   def mhv_account_type
     return nil unless mhv_account?
 
@@ -36,16 +42,22 @@ class MhvAccountTypeService
     DEFAULT_ACCOUNT_LEVEL
   end
 
+  #
+  #
   def mhv_account?
     user.mhv_correlation_id.present?
   end
 
+  #
+  #
   def account_type_known?
     user.identity.mhv_account_type.present?
   end
 
   private
 
+  #
+  #
   def fetch_eligible_data_classes
     if cached_eligible_data_class
       json = Oj.load(cached_eligible_data_class)
@@ -66,6 +78,8 @@ class MhvAccountTypeService
     namespace.get(cache_key)
   end
 
+  #
+  #
   def log_account_type_heuristic_once(message, extra_context = {})
     return if @logged
     extra_context.merge!(

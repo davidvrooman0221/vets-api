@@ -2,6 +2,7 @@
 
 require 'common/models/base'
 # Prescription model
+# TODO: Following link is invalid
 # Reference: https://github.com/department-of-veterans-affairs/prescriptions-team/blob/master/API/sample_mvh_api_calls
 class Prescription < Common::Base
   attribute :prescription_id, Integer, sortable: { order: 'ASC' }, filterable: %w[eq not_eq]

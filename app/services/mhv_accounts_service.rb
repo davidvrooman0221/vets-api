@@ -3,6 +3,9 @@
 require 'mhv_ac/client'
 require 'sentry_logging'
 
+##
+# Class to abstract MHV Account creation and upgrade logic
+#
 class MhvAccountsService
   include SentryLogging
 
@@ -12,7 +15,13 @@ class MhvAccountsService
 
   ADDRESS_ATTRS = %w[street city state postal_code country].freeze
 
+  ##
+  #
+  # @param mhv_account []
+  # @param user []
+  #
   def initialize(mhv_account, user)
+    binding.pry
     @mhv_account = mhv_account
     @mhv_account.user = user
   end
@@ -21,6 +30,9 @@ class MhvAccountsService
 
   delegate :user, to: :mhv_account
 
+  ##
+  # Create a new MHV account
+  #
   def create
     if mhv_account.creatable?
       client_response = mhv_ac_client.post_register(params_for_registration)
@@ -42,11 +54,16 @@ class MhvAccountsService
     raise e
   end
 
+  ##
+  # Upgrade an MHV account
+  #
   def upgrade
     if mhv_account.upgradable?
       handle_upgrade!
-    elsif mhv_account.already_premium? && mhv_account.registered_at? # we have historic evidence that some accounts
-      mhv_account.upgrade! # we registered became 'Premium' on their own, so we want track it similarly as before.
+    elsif mhv_account.already_premium? && mhv_account.registered_at?
+      # we have historic evidence that some accounts we registered became 'Premium' on their own,
+      # so we want to track it similarly as before.
+      mhv_account.upgrade!
     else
       StatsD.increment(STATSD_ACCOUNT_EXISTED_KEY.to_s)
       mhv_account.existing_premium! # without updating the timestamp since account was not created at vets.gov

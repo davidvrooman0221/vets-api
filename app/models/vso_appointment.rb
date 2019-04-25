@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Provides a class for VSO (Veteran Service Organization) Appointments
+# @todo: can likely be refactored now that we're on Rails 5?
 class VsoAppointment
   extend ActiveModel::Callbacks
 
